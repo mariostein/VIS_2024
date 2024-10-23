@@ -22,7 +22,7 @@ class SingleMassOscillator(Model):
         super().__init__(iniState)
         self.m = m  # mass
         self.k = k  # stiffness (spring constant)
-        self.d = 2*d*np*(self.m/self.k)  # damping coefficient
+        self.d = 2*d*np.sqrt(self.k*self.m)  # damping coefficient
 
     def dydt(self, t):
         """Compute the derivatives of the state (velocity and acceleration)."""

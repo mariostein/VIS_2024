@@ -10,7 +10,7 @@ def run_simulation():
     d = 0.5     # damping coefficient
 
     # initial conditions
-    iniStates = np.array([3.0, 0.0])
+    iniStates = np.array([1.0, 0.0])
 
     # Time parameters
     t_final = 15.0
