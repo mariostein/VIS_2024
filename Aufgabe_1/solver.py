@@ -30,3 +30,6 @@ class SolverExplicit(Solver):
         
         # Set the new state in the model
         self.__model__.set_state([new_position, new_velocity])
+
+class SolverImplizit(Solver):
+    
