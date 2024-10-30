@@ -13,15 +13,15 @@ import solver
 def run_simulation():
     # Parameters
     m = 1.0      # mass (kg)
-    k = 100000.0     # stiffness (N/m)
-    d = 0.01      # damping coefficient
+    k = 100.0     # stiffness (N/m)
+    d = 0.05      # damping coefficient
 
     # initial conditions
     iniStates = np.array([1.0, 0.0])
 
     # Time parameters
     t_final = 1.0
-    dt = 0.0001
+    dt = 0.01
     num_steps = int(t_final / dt)
 
     # Create a model (SingleMassOscillator)
