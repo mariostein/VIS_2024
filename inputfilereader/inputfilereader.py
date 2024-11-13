@@ -26,4 +26,4 @@ for line in fileContent:
 
     currentTextBlock.append(line)
 
-print("numberOfRigidBodys =",listOfMbsObjects)
+print(len(listOfMbsObjects))
