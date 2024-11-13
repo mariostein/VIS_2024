@@ -5,22 +5,22 @@ fileContent = f.read().splitlines()
 f.close()
 
 
-currentTextType = ""
+currentBlockType = ""
 currentTextBlock =[]
 search4Objects = []
 listOfMbsObjects = []
 
 for line in fileContent:
     if(line.find("$")>=0): #neuer Block wurde gefunden
-        if(currentTextType != ""):
-            if(currentTextType == "RIGID_BODY"):
+        if(currentBlockType != ""):
+            if(currentBlockType == "RIGID_BODY"):
                 listOfMbsObjects.append(mbsObject.mbsObject("body",currentTextBlock))
-            currentTextType = ""
+            currentBlockType = ""
 
 
     for type_i in search4Objects:
         if(line.find(type_i,1,len(type_i)+1)>=0):
-            currentTextType = type_i
+            currentBlockType = type_i
             currentTextBlock.clear()
             break
 
