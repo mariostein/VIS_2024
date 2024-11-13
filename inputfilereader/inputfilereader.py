@@ -7,7 +7,7 @@ f.close()
 
 currentBlockType = ""
 currentTextBlock =[]
-search4Objects = []
+search4Objects = ["RIGID_BODY"]
 listOfMbsObjects = []
 
 for line in fileContent:
@@ -19,7 +19,7 @@ for line in fileContent:
 
 
     for type_i in search4Objects:
-        if(line.find(type_i,1,len(type_i)+1)>=0):
+        if(line.find(type_i,1,len(type_i)+1) >=0):
             currentBlockType = type_i
             currentTextBlock.clear()
             break

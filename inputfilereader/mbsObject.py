@@ -1,4 +1,4 @@
-class mbsObjecct:
+class mbsObject:
     def __init__(self,type,text):
         self.__type = type
 
