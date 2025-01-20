@@ -9,9 +9,11 @@ import os
 
 class mbsModel:
     def __init__(self):
+        # Initialisiert eine leere Liste von mbsObjects
         self.__mbsObjectList = []
 
     def importFddFile(self, filepath):
+        # Importiert eine .fdd-Datei und liest die mbsObjects ein
         file_name, file_extension = os.path.splitext(filepath)
         if file_extension == ".fdd":
             self.__mbsObjectList = inputfilereader.readInput(filepath)
@@ -24,12 +26,14 @@ class mbsModel:
         return True
         
     def exportFdsFile(self, filepath):
+        # Exportiert die mbsObjects in eine .fds-Datei
         f = open(filepath, "w")
         for object in self.__mbsObjectList:
             object.writeSolverInput(f)
         f.close()
         
     def loadDatabase(self, database2Load):
+        # Lädt eine Datenbank (JSON-Datei) und erstellt die entsprechenden mbsObjects
         f = open(database2Load)
         data = json.load(f)
         f.close()
@@ -51,7 +55,7 @@ class mbsModel:
         return True
 
     def saveDatabase(self, dataBasePath):
-        # Serializing json
+        # Speichert die mbsObjects in einer Datenbank (JSON-Datei)
         modelObjects = []
         for object in self.__mbsObjectList:
             modelObject = {
@@ -67,5 +71,6 @@ class mbsModel:
             outfile.write(jDataBase)
 
     def showModel(self, renderer):
+        # Zeigt das Modell im Renderer an
         for object in self.__mbsObjectList:
             object.show(renderer)

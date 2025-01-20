@@ -23,112 +23,121 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("3D-Viewer mit VTK")
         self.resize(800, 600)
 
-        # Initialize model
+        # Modell initialisieren
         self.model = None
 
-        # Create main layout
+        # Hauptlayout erstellen
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
         self.layout = QVBoxLayout(self.central_widget)
 
-        # Add VTK render window
+        # VTK-Render-Fenster hinzufügen
         self.vtk_widget = QVTKRenderWindowInteractor(self.central_widget)
         self.layout.addWidget(self.vtk_widget)
 
-        # Create VTK renderer
+        # VTK-Renderer erstellen
         self.renderer = vtk.vtkRenderer()
         self.vtk_widget.GetRenderWindow().AddRenderer(self.renderer)
 
-        # Set default background color (black)
+        # Standard-Hintergrundfarbe (schwarz) setzen
         self.renderer.SetBackground(0.0, 0.0, 0.0)
 
-        # Setup menu and toolbar
+        # Menü und Toolbar einrichten
         self._create_menu()
         self._create_toolbar()
 
-        # Setup status bar
+        # Statusleiste einrichten
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
 
-        # Initialize CSYS visibility flag
+        # Sichtbarkeitsflag für CSYS initialisieren
         self.cs_visible = False
 
         self.show()
 
     def _create_menu(self):
+        # Menüleiste erstellen
         menu_bar = self.menuBar()
 
-        # File menu
-        file_menu = menu_bar.addMenu("File")
+        # Datei-Menü
+        file_menu = menu_bar.addMenu("Datei")
 
-        load_action = QAction("Load", self)
+        load_action = QAction("Laden", self)
         load_action.triggered.connect(self.load_model)
         file_menu.addAction(load_action)
 
-        save_action = QAction("Save", self)
+        save_action = QAction("Speichern", self)
         save_action.triggered.connect(self.save_model)
         file_menu.addAction(save_action)
 
-        import_action = QAction("Import FDD", self)
+        import_action = QAction("FDD importieren", self)
         import_action.triggered.connect(self.import_fdd)
         file_menu.addAction(import_action)
 
-        exit_action = QAction("Exit", self)
+        exit_action = QAction("Beenden", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
-        # View menu
-        view_menu = menu_bar.addMenu("View")
+        # Ansicht-Menü
+        view_menu = menu_bar.addMenu("Ansicht")
 
-        # Add actions to the "Choose View" submenu
+        # Aktionen zum Untermenü "Ansicht wählen" hinzufügen
         view_menu.addAction("Iso", lambda: self.change_view("Iso"))
-        view_menu.addAction("Right", lambda: self.change_view("Right"))
-        view_menu.addAction("Front", lambda: self.change_view("Front"))
-        view_menu.addAction("Top", lambda: self.change_view("Top"))
+        view_menu.addAction("Rechts", lambda: self.change_view("Rechts"))
+        view_menu.addAction("Vorne", lambda: self.change_view("Vorne"))
+        view_menu.addAction("Oben", lambda: self.change_view("Oben"))
 
         self.setMenuBar(menu_bar)
 
     def _create_toolbar(self):
-        # Create toolbar
-        toolbar = QToolBar("View Toolbar", self)
+        # Toolbar erstellen
+        toolbar = QToolBar("Ansicht Toolbar", self)
         self.addToolBar(toolbar)
 
-        # Create the background button with dropdown menu
+        # Hintergrund-Schaltfläche mit Dropdown-Menü erstellen
         background_button = QToolButton(self)
-        background_button.setText("Background")
+        background_button.setText("Hintergrund")
         background_menu = QMenu(self)
 
-        # Add actions to the menu
-        black_action = QAction("Black", self)
+        # Aktionen zum Menü hinzufügen
+        black_action = QAction("Schwarz", self)
         black_action.triggered.connect(lambda: self.set_background_color(0.0, 0.0, 0.0))
         background_menu.addAction(black_action)
 
-        white_action = QAction("White", self)
+        white_action = QAction("Weiß", self)
         white_action.triggered.connect(lambda: self.set_background_color(1.0, 1.0, 1.0))
         background_menu.addAction(white_action)
 
-        yellow_action = QAction("Yellow", self)
+        yellow_action = QAction("Gelb", self)
         yellow_action.triggered.connect(lambda: self.set_background_color(1.0, 1.0, 0.0))
         background_menu.addAction(yellow_action)
 
-        # Set the menu for the button
+        # Menü für die Schaltfläche setzen
         background_button.setMenu(background_menu)
         background_button.setPopupMode(QToolButton.InstantPopup)
 
-        # Add the button to the toolbar
+        # Schaltfläche zur Toolbar hinzufügen
         toolbar.addWidget(background_button)
 
-        # Create CSYS toggle button
+        # CSYS-Umschalt-Schaltfläche erstellen
         csys_button = QToolButton(self)
         csys_button.setText("CSYS")
         csys_button.clicked.connect(self.toggle_csys)
 
-        # Add the CSYS button to the toolbar
+        # CSYS-Schaltfläche zur Toolbar hinzufügen
         toolbar.addWidget(csys_button)
 
+        # Fit-Schaltfläche erstellen
+        fit_button = QToolButton(self)
+        fit_button.setText("Anpassen")
+        fit_button.clicked.connect(self.fit_model)
+
+        # Fit-Schaltfläche zur Toolbar hinzufügen
+        toolbar.addWidget(fit_button)
+
     def toggle_csys(self):
-        """Toggle the visibility of the CSYS."""
+        """Sichtbarkeit des CSYS umschalten."""
         if self.cs_visible:
             self.renderer.RemoveActor(self.coordinate_system_actor)
             self.cs_visible = False
@@ -140,120 +149,136 @@ class MainWindow(QMainWindow):
         self.vtk_widget.GetRenderWindow().Render()
 
     def create_csys(self):
-        """Create a coordinate system (CSYS) using vtkAxesActor."""
-        # Create the coordinate system (axes)
+        """Koordinatensystem (CSYS) mit vtkAxesActor erstellen."""
+        # Koordinatensystem (Achsen) erstellen
         self.coordinate_system_actor = vtk.vtkAxesActor()
 
-        # Scale up the coordinate system to make it larger
-        self.coordinate_system_actor.SetScale(2.0, 2.0, 2.0)  # Scale X, Y, Z axes
+        # Koordinatensystem vergrößern
+        self.coordinate_system_actor.SetTotalLength(0.5, 0.5, 0.5)  # X-, Y-, Z-Achsen skalieren
 
-        # Position the coordinate system in the left corner of the VTK view
-        self.coordinate_system_actor.SetPosition(-2.5, -2.5, 0)  # Adjust these values as needed
+        # Koordinatensystem in der unteren linken Ecke des VTK-Fensters positionieren
+        self.coordinate_system_actor.SetPosition(0.1, 0.1, 0.0)
 
-        # Set up the coordinate system's properties (optional)
+        # Eigenschaften des Koordinatensystems einrichten (optional)
         self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
+        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)
+        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
+
         self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
+        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)
+        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
+
         self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
+        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)
+        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
+
+        # CSYS-Akteur zum Renderer hinzufügen
+        self.renderer.AddActor(self.coordinate_system_actor)
 
     def change_view(self, view):
-        """Change the camera view based on the selected option."""
+        """Kameraperspektive basierend auf der ausgewählten Option ändern."""
         if not self.renderer:
             return
 
-        # Adjust the camera to the selected view
+        # Kamera an die ausgewählte Ansicht anpassen
         camera = self.renderer.GetActiveCamera()
 
-        # Reset the camera to the default position for each view
+        # Kamera auf die Standardposition für jede Ansicht zurücksetzen
         if view == "Iso":
             camera.SetPosition(1, 1, 1)
             camera.SetFocalPoint(0, 0, 0)
             camera.SetViewUp(0, 1, 0)
-        elif view == "Front":
-            # Rotate Front view 90° about the Z-axis
-            camera.SetPosition(0, 0, 1)  # Adjusted position
+        elif view == "Vorne":
+            # Vorderansicht um 90° um die Z-Achse drehen
+            camera.SetPosition(0, 0, 1)  # Angepasste Position
             camera.SetFocalPoint(0, 0, 0)
-            camera.SetViewUp(0, -1, 0)  # Adjusted ViewUp direction
-        elif view == "Right":
-            # Rotate Right view 90° about the Z-axis
-            camera.SetPosition(1, 0, 0)  # Adjusted position
+            camera.SetViewUp(0, -1, 0)  # Angepasste ViewUp-Richtung
+        elif view == "Rechts":
+            # Rechtsansicht um 90° um die Z-Achse drehen
+            camera.SetPosition(1, 0, 0)  # Angepasste Position
             camera.SetFocalPoint(0, 0, 0)
-            camera.SetViewUp(0, 1, 0)  # Adjusted ViewUp direction
-        elif view == "Top":
+            camera.SetViewUp(0, 1, 0)  # Angepasste ViewUp-Richtung
+        elif view == "Oben":
             camera.SetPosition(0, 1, 0)
             camera.SetFocalPoint(0, 0, 0)
             camera.SetViewUp(0, 0, 1)
 
-        # Always reset the camera and apply the new view
+        # Kamera immer zurücksetzen und die neue Ansicht anwenden
         self.renderer.ResetCamera()
         self.vtk_widget.GetRenderWindow().Render()
 
     def set_background_color(self, r, g, b):
-        """Set the background color of the VTK render window."""
+        """Hintergrundfarbe des VTK-Render-Fensters setzen."""
         self.renderer.SetBackground(r, g, b)
         self.vtk_widget.GetRenderWindow().Render()
 
     def load_model(self):
-        """Load a model from a JSON file."""
-        file_name, _ = QFileDialog.getOpenFileName(self, "Load Model", "", "JSON Files (*.json)")
+        """Modell aus einer JSON-Datei laden."""
+        file_name, _ = QFileDialog.getOpenFileName(self, "Modell laden", "", "JSON-Dateien (*.json)")
         if file_name:
             try:
-                self.model = mbsModel.mbsModel()  # Initialize the model
-                self.model.loadDatabase(file_name)  # Load the model from JSON
-                self.status_bar.showMessage(f"Model loaded: {file_name}")
+                self.model = mbsModel.mbsModel()  # Modell initialisieren
+                self.model.loadDatabase(file_name)  # Modell aus JSON laden
+                self.status_bar.showMessage(f"Modell geladen: {file_name}")
                 self.render_model()
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to load model: {e}")
+                QMessageBox.critical(self, "Fehler", f"Modell konnte nicht geladen werden: {e}")
 
     def save_model(self):
-        """Save the current model to a JSON file."""
+        """Aktuelles Modell in einer JSON-Datei speichern."""
         if not self.model:
-            QMessageBox.warning(self, "Warning", "No model to save.")
+            QMessageBox.warning(self, "Warnung", "Kein Modell zum Speichern vorhanden.")
             return
 
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save Model", "", "JSON Files (*.json)")
+        file_name, _ = QFileDialog.getSaveFileName(self, "Modell speichern", "", "JSON-Dateien (*.json)")
         if file_name:
             try:
-                self.model.saveDatabase(file_name)  # Save the model as JSON
-                self.status_bar.showMessage(f"Model saved: {file_name}")
+                self.model.saveDatabase(file_name)  # Modell als JSON speichern
+                self.status_bar.showMessage(f"Modell gespeichert: {file_name}")
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to save model: {e}")
+                QMessageBox.critical(self, "Fehler", f"Modell konnte nicht gespeichert werden: {e}")
 
     def import_fdd(self):
-        """Import a model from a .fdd file."""
-        file_name, _ = QFileDialog.getOpenFileName(self, "Import FDD File", "", "FDD Files (*.fdd)")
+        """Modell aus einer .fdd-Datei importieren."""
+        file_name, _ = QFileDialog.getOpenFileName(self, "FDD-Datei importieren", "", "FDD-Dateien (*.fdd)")
         if file_name:
             try:
-                self.model = mbsModel.mbsModel()  # Initialize the model
-                if self.model.importFddFile(file_name):  # Import the model from FDD
-                    self.status_bar.showMessage(f"FDD file imported: {file_name}")
+                self.model = mbsModel.mbsModel()  # Modell initialisieren
+                if self.model.importFddFile(file_name):  # Modell aus FDD importieren
+                    self.status_bar.showMessage(f"FDD-Datei importiert: {file_name}")
                     self.render_model()
                 else:
-                    QMessageBox.critical(self, "Error", "Failed to import FDD file.")
+                    QMessageBox.critical(self, "Fehler", "FDD-Datei konnte nicht importiert werden.")
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to import FDD file: {e}")
+                QMessageBox.critical(self, "Fehler", f"FDD-Datei konnte nicht importiert werden: {e}")
 
     def render_model(self):
-        """Render the model in the VTK window."""
+        """Modell im VTK-Fenster rendern."""
         if not self.model:
             return
 
-        self.renderer.RemoveAllViewProps()  # Clear the renderer
+        self.renderer.RemoveAllViewProps()  # Renderer leeren
 
-        # Add mbsObjects to the renderer
-        self.model.showModel(self.renderer)  # Use model's showModel method
+        # mbsObjects zum Renderer hinzufügen
+        self.model.showModel(self.renderer)  # Methode showModel des Modells verwenden
 
         self.renderer.ResetCamera()
         self.vtk_widget.GetRenderWindow().Render()
 
+    def fit_model(self):
+        """Modell an das Fenster anpassen."""
+        self.renderer.ResetCamera()
+        self.vtk_widget.GetRenderWindow().Render()
+
 def main():
-    # Initialize the application and window
+    # Anwendung und Fenster initialisieren
     app = QApplication(sys.argv)
     window = MainWindow()
 
-    # Set the initial camera view to "Iso"
+    # Anfangsansicht auf "Iso" setzen
     window.change_view("Iso")
 
-    # If there's a command-line argument for the .fdd file, import it
+    # Wenn ein Kommandozeilenargument für die .fdd-Datei vorhanden ist, importieren
     if len(sys.argv) > 1:
         fdd_file_path = sys.argv[1]
         
@@ -262,7 +287,7 @@ def main():
         window.model.importFddFile(fdd_file_path)
         window.render_model()
 
-    # Otherwise, just start the regular GUI application
+    # Andernfalls die reguläre GUI-Anwendung starten
     sys.exit(app.exec())
 
 if __name__ == "__main__":
