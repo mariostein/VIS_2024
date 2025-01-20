@@ -51,6 +51,9 @@ class MainWindow(QMainWindow):
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
 
+        # Initialize CSYS visibility flag
+        self.cs_visible = False
+
         self.show()
 
     def _create_menu(self):
@@ -115,6 +118,42 @@ class MainWindow(QMainWindow):
 
         # Add the button to the toolbar
         toolbar.addWidget(background_button)
+
+        # Create CSYS toggle button
+        csys_button = QToolButton(self)
+        csys_button.setText("CSYS")
+        csys_button.clicked.connect(self.toggle_csys)
+
+        # Add the CSYS button to the toolbar
+        toolbar.addWidget(csys_button)
+
+    def toggle_csys(self):
+        """Toggle the visibility of the CSYS."""
+        if self.cs_visible:
+            self.renderer.RemoveActor(self.coordinate_system_actor)
+            self.cs_visible = False
+        else:
+            self.create_csys()
+            self.renderer.AddActor(self.coordinate_system_actor)
+            self.cs_visible = True
+
+        self.vtk_widget.GetRenderWindow().Render()
+
+    def create_csys(self):
+        """Create a coordinate system (CSYS) using vtkAxesActor."""
+        # Create the coordinate system (axes)
+        self.coordinate_system_actor = vtk.vtkAxesActor()
+
+        # Scale up the coordinate system to make it larger
+        self.coordinate_system_actor.SetScale(2.0, 2.0, 2.0)  # Scale X, Y, Z axes
+
+        # Position the coordinate system in the left corner of the VTK view
+        self.coordinate_system_actor.SetPosition(-2.5, -2.5, 0)  # Adjust these values as needed
+
+        # Set up the coordinate system's properties (optional)
+        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
+        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
+        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()
 
     def change_view(self, view):
         """Change the camera view based on the selected option."""
