@@ -51,9 +51,6 @@ class MainWindow(QMainWindow):  # Definiert die Klasse MainWindow, die von QMain
         self.status_bar = QStatusBar()  # Erstellt eine Statusleiste
         self.setStatusBar(self.status_bar)  # Setzt die Statusleiste
 
-        # Sichtbarkeitsflag für CSYS initialisieren
-        self.cs_visible = False  # Initialisiert das Sichtbarkeitsflag für das Koordinatensystem als False
-
         self.show()  # Zeigt das Hauptfenster an
 
     def _create_menu(self):  # Definiert die Methode zum Erstellen des Menüs
@@ -119,61 +116,6 @@ class MainWindow(QMainWindow):  # Definiert die Klasse MainWindow, die von QMain
 
         # Schaltfläche zur Toolbar hinzufügen
         toolbar.addWidget(background_button)  # Fügt die Hintergrund-Schaltfläche zur Toolbar hinzu
-
-        # CSYS-Umschalt-Schaltfläche erstellen
-        csys_button = QToolButton(self)  # Erstellt eine Schaltfläche für das Koordinatensystem
-        csys_button.setText("CSYS")  # Setzt den Text der Schaltfläche auf "CSYS"
-        csys_button.clicked.connect(self.toggle_csys)  # Verbindet die Schaltfläche mit der Methode toggle_csys
-
-        # CSYS-Schaltfläche zur Toolbar hinzufügen
-        toolbar.addWidget(csys_button)  # Fügt die CSYS-Schaltfläche zur Toolbar hinzu
-
-        # Fit-Schaltfläche erstellen
-        fit_button = QToolButton(self)  # Erstellt eine Schaltfläche zum Anpassen
-        fit_button.setText("Anpassen")  # Setzt den Text der Schaltfläche auf "Anpassen"
-        fit_button.clicked.connect(self.fit_model)  # Verbindet die Schaltfläche mit der Methode fit_model
-
-        # Fit-Schaltfläche zur Toolbar hinzufügen
-        toolbar.addWidget(fit_button)  # Fügt die Fit-Schaltfläche zur Toolbar hinzu
-
-    def toggle_csys(self):  # Definiert die Methode zum Umschalten der Sichtbarkeit des Koordinatensystems
-        """Sichtbarkeit des CSYS umschalten."""
-        if self.cs_visible:  # Überprüft, ob das Koordinatensystem sichtbar ist
-            self.renderer.RemoveActor(self.coordinate_system_actor)  # Entfernt den Koordinatensystem-Akteur vom Renderer
-            self.cs_visible = False  # Setzt das Sichtbarkeitsflag auf False
-        else:
-            self.create_csys()  # Erstellt das Koordinatensystem
-            self.renderer.AddActor(self.coordinate_system_actor)  # Fügt den Koordinatensystem-Akteur zum Renderer hinzu
-            self.cs_visible = True  # Setzt das Sichtbarkeitsflag auf True
-
-        self.vtk_widget.GetRenderWindow().Render()  # Aktualisiert das Render-Fenster
-
-    def create_csys(self):  # Definiert die Methode zum Erstellen des Koordinatensystems
-        """Koordinatensystem (CSYS) mit vtkAxesActor erstellen."""
-        # Koordinatensystem (Achsen) erstellen
-        self.coordinate_system_actor = vtk.vtkAxesActor()  # Erstellt einen vtkAxesActor für das Koordinatensystem
-
-        # Koordinatensystem vergrößern
-        self.coordinate_system_actor.SetTotalLength(0.5, 0.5, 0.5)  # X-, Y-, Z-Achsen skalieren
-
-        # Koordinatensystem in der unteren linken Ecke des VTK-Fensters positionieren
-        self.coordinate_system_actor.SetPosition(0.1, 0.1, 0.0)  # Setzt die Position des Koordinatensystems
-
-        # Eigenschaften des Koordinatensystems einrichten (optional)
-        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()  # Setzt den Textskalierungsmodus der X-Achse
-        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)  # Setzt die Schriftgröße der X-Achse
-        self.coordinate_system_actor.GetXAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
-
-        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()  # Setzt den Textskalierungsmodus der Y-Achse
-        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)  # Setzt die Schriftgröße der Y-Achse
-        self.coordinate_system_actor.GetYAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
-
-        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().SetTextScaleModeToNone()  # Setzt den Textskalierungsmodus der Z-Achse
-        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(24)  # Setzt die Schriftgröße der Z-Achse
-        self.coordinate_system_actor.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetSpacing(5)  # Buchstabenabstand vergrößern
-
-        # CSYS-Akteur zum Renderer hinzufügen
-        self.renderer.AddActor(self.coordinate_system_actor)  # Fügt den Koordinatensystem-Akteur zum Renderer hinzu
 
     def change_view(self, view):  # Definiert die Methode zum Ändern der Kameraperspektive
         """Kameraperspektive basierend auf der ausgewählten Option ändern."""
@@ -262,11 +204,6 @@ class MainWindow(QMainWindow):  # Definiert die Klasse MainWindow, die von QMain
         # mbsObjects zum Renderer hinzufügen
         self.model.showModel(self.renderer)  # Methode showModel des Modells verwenden
 
-        self.renderer.ResetCamera()  # Kamera zurücksetzen
-        self.vtk_widget.GetRenderWindow().Render()  # Render-Fenster aktualisieren
-
-    def fit_model(self):  # Definiert die Methode zum Anpassen des Modells an das Fenster
-        """Modell an das Fenster anpassen."""
         self.renderer.ResetCamera()  # Kamera zurücksetzen
         self.vtk_widget.GetRenderWindow().Render()  # Render-Fenster aktualisieren
 
